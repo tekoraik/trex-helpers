@@ -1,0 +1,11 @@
+#valign-abs-container {
+    background-color: rgb(107, 107, 107);
+    width: 800px;
+    height: 420px;
+    position: relative;
+}
+#valign-abs-container > div {
+    background-color: rgb(238, 205, 91);
+    width: 800px;
+    height: 120px;
+}

@@ -17,14 +17,14 @@ describe("TrexHelpers", function() {
     describe("when there is a element with valign-abs class, 250px height and it doesn't have parent and window.height = 500", function () {
         beforeEach(function () {
             var parentOriginal = $.prototype.parent,
-                heightOriginal = $.prototype.height;
+                heightOriginal = $.prototype.height,
+                testElement;
 
             affix('.valign-abs#test');
             $('#test').css('height', "250px");
+            testElement = $('#test')[0];
             spyOn($.prototype , 'parent').and.callFake(function () {
-
-
-                if (this.selector == '#test') {
+                if (this[0] == testElement) {
                     return $(document.body);
                 } else {
                     return parentOriginal.apply(this, arguments);
@@ -46,4 +46,15 @@ describe("TrexHelpers", function() {
         });
     });
 
+    describe("when there is a element with valign-abs class inside another, 220px height and its parent with height 400px", function () {
+        beforeEach(function () {
+            affix('#parent .valign-abs#test');
+            $('#test').css('height', "220px");
+            $('#parent').css('height', "400px");
+        });
+        it("should have top position = 90px", function() {
+            trex.helpers.refresh();
+            expect($('#test').css('top')).toEqual('90px');
+        });
+    });
 });
