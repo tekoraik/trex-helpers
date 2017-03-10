@@ -1,5 +1,18 @@
 describe("TrexHelpers", function() {
-    var helpers;
+    var helpers, windowHeighIs;
+
+    windowHeighIs = function (height) {
+        var heightOriginal = $.prototype.height;
+
+        spyOn($.prototype, 'height').and.callFake(function () {
+            var original = $.prototype.height;
+            if (this[0] === window) {
+                return height;
+            } else {
+                return heightOriginal.apply(this, arguments);
+            }
+        });
+    };
 
     beforeEach(function() {
         herpers = trex.helpers;
@@ -9,15 +22,15 @@ describe("TrexHelpers", function() {
         beforeEach(function () {
             affix('.valign-abs#test');
         });
-        it("should have top position absolute", function() {
+        it("should have position absolute and the parent position relative", function() {
             trex.helpers.refresh();
             expect($('#test').css('position')).toBe('absolute');
+            expect($('#test').parent().css('position')).toBe('relative');
         });
     });
     describe("when there is a element with valign-abs class, 250px height and it doesn't have parent and window.height = 500", function () {
         beforeEach(function () {
             var parentOriginal = $.prototype.parent,
-                heightOriginal = $.prototype.height,
                 testElement;
 
             affix('.valign-abs#test');
@@ -30,14 +43,7 @@ describe("TrexHelpers", function() {
                     return parentOriginal.apply(this, arguments);
                 }
             });
-            spyOn($.prototype, 'height').and.callFake(function () {
-                var original = $.prototype.height;
-                if (this[0] === window) {
-                    return 500;
-                } else {
-                    return heightOriginal.apply(this, arguments);
-                }
-            });
+            windowHeighIs(500);
         });
 
         it("should have top position in 125px", function() {
@@ -46,15 +52,81 @@ describe("TrexHelpers", function() {
         });
     });
 
-    describe("when there is a element with valign-abs class inside another, 220px height and its parent with height 400px", function () {
+    describe("when there is a element with valign-abs class 220px height inside another", function () {
         beforeEach(function () {
             affix('#parent .valign-abs#test');
             $('#test').css('height', "220px");
-            $('#parent').css('height', "400px");
         });
-        it("should have top position = 90px", function() {
+
+        describe('and their parent has a window-height class, and window height is 500px', function () {
+            beforeEach(function () {
+                $('#parent').addClass('window-height');
+                windowHeighIs(500);
+            });
+
+            it('should have top position 140px', function () {
+                trex.helpers.refresh();
+                expect($('#test').css('top')).toEqual('140px');
+            });
+        });
+        describe('and their parent height is 400px', function () {
+            beforeEach(function () {
+                $('#parent').css('height', "400px");
+            });
+
+            it("should have top position = 90px", function() {
+                trex.helpers.refresh();
+                expect($('#test').css('top')).toEqual('90px');
+            });
+        });
+
+        describe('and their parent height is 100px', function () {
+            beforeEach(function () {
+                $('#parent').css('height', "100px");
+            });
+
+            it("should have top position = 0px because the parent height is smaller", function() {
+                trex.helpers.refresh();
+                expect($('#test').css('top')).toEqual('0px');
+            });
+        });
+    });
+
+    describe('when there is a elements with window-height class', function () {
+        beforeEach(function () {
+            affix('.window-height#id1');
+            affix('#id2 .window-height');
+            windowHeighIs(100);
+        });
+
+        it('should have the same height that window as minimum height', function () {
             trex.helpers.refresh();
-            expect($('#test').css('top')).toEqual('90px');
+            expect($('.window-height#id1').outerHeight()).toEqual(100);
+            expect($('#id2 > .window-height').outerHeight()).toEqual(100);
+        });
+
+        describe('and also there is a fixed element', function () {
+            beforeEach(function () {
+                affix('.fixed');
+                $('.fixed').css('height', '10px');
+            });
+
+            it('should be the window height minus fixed element', function () {
+                trex.helpers.refresh();
+                expect($('.window-height#id1').outerHeight()).toEqual(90);
+                expect($('#id2 > .window-height').outerHeight()).toEqual(90);
+            });
+        });
+
+        describe('and this element has padding', function () {
+            beforeEach(function () {
+                $('#id1').css('padding', '20px 0px 10px 0px');
+            });
+
+            it('should be the window height too', function () {
+                trex.helpers.refresh();
+                expect($('#id1').outerHeight()).toEqual(100);
+            });
         });
     });
 });
