@@ -2,7 +2,14 @@
     trex = window.trex || {};
 
     trex.helpers = (function () {
-        var _refresh, _refreshVerticalAligns, _refreshWindowHeight;
+        var _refresh,
+            _refreshVerticalAligns,
+            _refreshWindowHeight,
+            _refreshAbsVerticalAligns,
+            _refreshMarginVerticalAligns,
+            _getTopElement,
+            _refreshTotalWindowHeight,
+            _refreshPercentWindowHeight;
 
         _refresh = function() {
             _refreshWindowHeight();
@@ -10,29 +17,82 @@
         };
 
         _refreshVerticalAligns = function () {
+            _refreshAbsVerticalAligns();
+            _refreshMarginVerticalAligns();
+        };
+
+        _refreshAbsVerticalAligns = function () {
             $('.vcenter-abs').each(function () {
-                var $topElement = $(this).parent();
+                var $element = $(this), $topElement = _getTopElement($element);
+
+                $element.css('position', 'absolute');
+                $element.parent().css('position', 'relative');
+
+                if ($topElement.height() <= $element.outerHeight()) {
+                    $(this).css('top', '0px');
+                } else {
+                    $(this).css('top', Math.floor(($topElement.height() / 2) - ($element.outerHeight() / 2)) + 'px');
+                }
+            });
+        };
+
+        _refreshMarginVerticalAligns = function () {
+            $('.vcenter-margin').each(function () {
+                var $element = $(this),
+                    $topElement = _getTopElement($element),
+                    margin = 0,
+                    paddingTop,
+                    paddingBottom;
 
                 if ($topElement[0] == document.body) {
                     $topElement = $(window);
                 }
 
-                $(this).css('position', 'absolute');
-                $(this).parent().css('position', 'relative');
-
-                if ($topElement.height() <= $(this).height()) {
-                    $(this).css('top', '0px');
+                if ($topElement.height() <= $element.height()) {
+                    $element.css('margin-top', '0px');
+                    $element.css('margin-bottom', '0px');
                 } else {
-                    $(this).css('top', Math.floor(($topElement.height() / 2) - ($(this).height() / 2)) + 'px');
+                    paddingTop = $(this).css('padding-top').replace('px', '');
+                    paddingBottom = $(this).css('padding-bottom').replace('px', '');
+
+                    margin = Math.floor(($topElement.height() - $element.height()) / 2);
+
+                    $element.css('margin-top', (margin - paddingTop) + 'px');
+                    $element.css('margin-bottom', (margin - paddingBottom) + 'px');
                 }
             });
         };
 
-        _refreshWindowHeight = function () {
-            $('.window-height').css('box-sizing', 'border-box');
-            $('.window-height').css('min-height', ($(window).height() - $('.fixed').height()) + 'px');
+        _getTopElement = function ($element) {
+            var $topElement = $element.parent();
+
+            if ($topElement[0] == document.body) {
+                $topElement = $(window);
+            }
+            return $topElement;
         };
 
+        _refreshWindowHeight = function () {
+            _refreshTotalWindowHeight();
+            _refreshPercentWindowHeight();
+        };
+
+        _refreshTotalWindowHeight = function () {
+            var $group = $('.window-height');
+
+            $group.css('box-sizing', 'border-box');
+            $group.css('min-height', ($(window).height() - $('.fixed').height()) + 'px');
+        };
+
+        _refreshPercentWindowHeight = function () {
+            $('.percent-window').each(function() {
+                var $element = $(this), height, percent;
+                percent = $element.data('percent') / 100;
+                height = $(window).height() * percent;
+                $element.css('min-height', height + 'px');
+            });
+
+        };
         return {
             refresh: _refresh,
         }

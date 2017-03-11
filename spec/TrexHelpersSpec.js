@@ -78,6 +78,30 @@ describe("TrexHelpers", function() {
                 helpers.refresh();
                 expect($('#test').css('top')).toEqual('90px');
             });
+
+            describe('and the element has paddings (10px top, 20px bottom)', function () {
+                beforeEach(function () {
+                    $('#test').css('padding-top', '10px');
+                    $('#test').css('padding-bottom', '20px');
+                });
+
+                it('should have top position = 75px', function () {
+                    helpers.refresh();
+                    expect($('#test').css('top')).toEqual('75px');
+                });
+            });
+
+            describe('and the element has excedent paddings (100px top, 100px bottom)', function () {
+                beforeEach(function () {
+                    $('#test').css('padding-top', '100px');
+                    $('#test').css('padding-bottom', '100px');
+                });
+
+                it('should have top position = 0px', function () {
+                    helpers.refresh();
+                    expect($('#test').css('top')).toEqual('0px');
+                });
+            });
         });
 
         describe('and their parent height is 100px', function () {
@@ -130,13 +154,13 @@ describe("TrexHelpers", function() {
         });
     });
 
-    describe("when there is a element with vcenter-margin class, 250px height and it doesn't have parent and window.height = 500", function () {
+    describe("when there is a element with vcenter-margin class, 200px height and it doesn't have parent and window.height = 500", function () {
         beforeEach(function () {
             var parentOriginal = $.prototype.parent,
                 testElement;
 
             affix('.vcenter-margin#test');
-            $('#test').css('height', "250px");
+            $('#test').css('height', "200px");
             testElement = $('#test')[0];
             spyOn($.prototype , 'parent').and.callFake(function () {
                 if (this[0] == testElement) {
@@ -148,10 +172,88 @@ describe("TrexHelpers", function() {
             windowHeighIs(500);
         });
 
-        it("should have margin-top and margin-bottom 125px", function() {
+        it("should have margin-top and margin-bottom 150px", function() {
             helpers.refresh();
-            expect($('#test').css('margin-top')).toEqual('125px');
-            expect($('#test').css('margin-bottom')).toEqual('125px');
+            expect($('#test').css('margin-top')).toEqual('150px');
+            expect($('#test').css('margin-bottom')).toEqual('150px');
         });
+
+        describe('if the element has 20 top padding and 30 bottom padding', function () {
+            beforeEach(function () {
+                $('#test').css('padding-top', "20px");
+                $('#test').css('padding-bottom', "30px");
+            });
+
+            it("should have margin-top 130px and margin-bottom 120px", function() {
+                helpers.refresh();
+                expect($('#test').css('margin-top')).toEqual('130px');
+                expect($('#test').css('margin-bottom')).toEqual('120px');
+            });
+        });
+    });
+
+    describe('when there is a element with percent-window class and window height is 600px', function () {
+        beforeEach(function () {
+            windowHeighIs(600);
+            affix('.percent-window#test');
+        });
+
+        describe('and this element has data-percent=40', function () {
+            beforeEach(function () {
+                $('#test').data('percent', '40');
+            });
+
+            it('should have 240px height', function () {
+                helpers.refresh();
+                expect($('#test').height()).toEqual(240);
+            });
+
+            describe('and there is a vcenter-abs element inside', function () {
+                beforeEach(function () {
+                    $('#test').append('<div class="vcenter-abs"></div>');
+                    $('#test .vcenter-abs').css('height', '50px');
+                });
+
+                it('should have top position > 0', function () {
+                    helpers.refresh();
+                    expect($('#test .vcenter-abs').css('top').replace('px', '')).toBeGreaterThan(0);
+                });
+            });
+
+            describe('and there is another percent-window with data-percent=50', function () {
+                beforeEach(function () {
+                    affix('.percent-window#test2');
+                    $('#test2').data('percent', '50');
+                });
+
+                it('should have 240px height the first element and 300px the second element', function () {
+                    helpers.refresh();
+                    expect($('#test').height()).toEqual(240);
+                    expect($('#test2').height()).toEqual(300);
+                });
+            });
+        });
+    });
+
+    describe('when there is a goto element with data-target in another element', function () {
+        beforeEach(function() {
+            var targetElement, offsetOriginal;
+            affix('a.goto#test');
+            affix('#target');
+            $('#test').data('target', '#target');
+            targetElement = $('#target')[0];
+            offsetOriginal = $.prototype.offset;
+            spyOn($.prototype , 'offset').and.callFake(function () {
+                if (this[0] == targetElement) {
+                    return {
+                        top: 2800
+                    }
+                } else {
+                    return offsetOriginal.apply(this, arguments);
+                }
+            });
+        });
+
+        it('should animate scroll on goto element click', function () {});
     });
 });
