@@ -236,13 +236,20 @@ describe("TrexHelpers", function() {
     });
 
     describe('when there is a goto element with data-target in another element', function () {
+        var animateArguments;
+
+        afterEach(function () {
+            animateArguments = undefined;
+        });
+
         beforeEach(function() {
-            var targetElement, offsetOriginal;
+            var targetElement, offsetOriginal, animateOriginal;
             affix('a.goto#test');
             affix('#target');
             $('#test').data('target', '#target');
             targetElement = $('#target')[0];
             offsetOriginal = $.prototype.offset;
+            animateOriginal = $.prototype.animate;
             spyOn($.prototype , 'offset').and.callFake(function () {
                 if (this[0] == targetElement) {
                     return {
@@ -252,8 +259,35 @@ describe("TrexHelpers", function() {
                     return offsetOriginal.apply(this, arguments);
                 }
             });
+
+            spyOn($.prototype , 'animate').and.callFake(function () {
+                if (this.selector == "html, body") {
+                    animateArguments = arguments;
+                } else {
+                    return offsetOriginal.apply(this, arguments);
+                }
+            });
         });
 
-        it('should animate scroll on goto element click', function () {});
+        it('should animate scroll on goto element click to the top position of target', function () {
+            helpers.refresh();
+            $('#test').trigger('click');
+            expect(animateArguments).not.toBeUndefined();
+            expect(animateArguments[0].scrollTop).toEqual(2800);
+        });
+
+        describe('when there is fixed elements', function () {
+            beforeEach(function() {
+                affix('.fixed#fixed');
+                $('#fixed').css('height', '50px');
+            });
+
+            it('should animate scroll on goto element click to the top position of target minus fixed element height', function () {
+                helpers.refresh();
+                $('#test').trigger('click');
+                expect(animateArguments).not.toBeUndefined();
+                expect(animateArguments[0].scrollTop).toEqual(2750);
+            });
+        });
     });
 });

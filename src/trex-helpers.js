@@ -9,11 +9,13 @@
             _refreshMarginVerticalAligns,
             _getTopElement,
             _refreshTotalWindowHeight,
-            _refreshPercentWindowHeight;
+            _refreshPercentWindowHeight,
+            _setupGoto;
 
         _refresh = function() {
             _refreshWindowHeight();
             _refreshVerticalAligns();
+            _setupGoto();
         };
 
         _refreshVerticalAligns = function () {
@@ -92,6 +94,17 @@
                 $element.css('min-height', height + 'px');
             });
 
+        };
+
+        _setupGoto = function () {
+            $(window.document).on('click', '.goto', function (event) {
+                var target = $($(this).data('target')),
+                    top = target.offset().top;
+
+                event.preventDefault();
+                window.history.pushState({}, '', '#' + target.attr('id'));
+                $('html, body').animate({scrollTop: Math.max(0, top - $('.fixed').height())}, 1000, 'swing');
+            });
         };
         return {
             refresh: _refresh,
