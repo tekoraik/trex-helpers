@@ -15,25 +15,25 @@ describe("TrexHelpers", function() {
     };
 
     beforeEach(function() {
-        herpers = trex.helpers;
+        helpers = trex.helpers;
     });
 
-    describe("when there is a element with valign-abs class", function () {
+    describe("when there is a element with vcenter-abs class", function () {
         beforeEach(function () {
-            affix('.valign-abs#test');
+            affix('.vcenter-abs#test');
         });
         it("should have position absolute and the parent position relative", function() {
-            trex.helpers.refresh();
+            helpers.refresh();
             expect($('#test').css('position')).toBe('absolute');
             expect($('#test').parent().css('position')).toBe('relative');
         });
     });
-    describe("when there is a element with valign-abs class, 250px height and it doesn't have parent and window.height = 500", function () {
+    describe("when there is a element with vcenter-abs class, 250px height and it doesn't have parent and window.height = 500", function () {
         beforeEach(function () {
             var parentOriginal = $.prototype.parent,
                 testElement;
 
-            affix('.valign-abs#test');
+            affix('.vcenter-abs#test');
             $('#test').css('height', "250px");
             testElement = $('#test')[0];
             spyOn($.prototype , 'parent').and.callFake(function () {
@@ -47,14 +47,14 @@ describe("TrexHelpers", function() {
         });
 
         it("should have top position in 125px", function() {
-            trex.helpers.refresh();
+            helpers.refresh();
             expect($('#test').css('top')).toEqual('125px');
         });
     });
 
-    describe("when there is a element with valign-abs class 220px height inside another", function () {
+    describe("when there is a element with vcenter-abs class 220px height inside another", function () {
         beforeEach(function () {
-            affix('#parent .valign-abs#test');
+            affix('#parent .vcenter-abs#test');
             $('#test').css('height', "220px");
         });
 
@@ -65,7 +65,7 @@ describe("TrexHelpers", function() {
             });
 
             it('should have top position 140px', function () {
-                trex.helpers.refresh();
+                helpers.refresh();
                 expect($('#test').css('top')).toEqual('140px');
             });
         });
@@ -75,7 +75,7 @@ describe("TrexHelpers", function() {
             });
 
             it("should have top position = 90px", function() {
-                trex.helpers.refresh();
+                helpers.refresh();
                 expect($('#test').css('top')).toEqual('90px');
             });
         });
@@ -86,7 +86,7 @@ describe("TrexHelpers", function() {
             });
 
             it("should have top position = 0px because the parent height is smaller", function() {
-                trex.helpers.refresh();
+                helpers.refresh();
                 expect($('#test').css('top')).toEqual('0px');
             });
         });
@@ -100,7 +100,7 @@ describe("TrexHelpers", function() {
         });
 
         it('should have the same height that window as minimum height', function () {
-            trex.helpers.refresh();
+            helpers.refresh();
             expect($('.window-height#id1').outerHeight()).toEqual(100);
             expect($('#id2 > .window-height').outerHeight()).toEqual(100);
         });
@@ -112,7 +112,7 @@ describe("TrexHelpers", function() {
             });
 
             it('should be the window height minus fixed element', function () {
-                trex.helpers.refresh();
+                helpers.refresh();
                 expect($('.window-height#id1').outerHeight()).toEqual(90);
                 expect($('#id2 > .window-height').outerHeight()).toEqual(90);
             });
@@ -124,9 +124,34 @@ describe("TrexHelpers", function() {
             });
 
             it('should be the window height too', function () {
-                trex.helpers.refresh();
+                helpers.refresh();
                 expect($('#id1').outerHeight()).toEqual(100);
             });
+        });
+    });
+
+    describe("when there is a element with vcenter-margin class, 250px height and it doesn't have parent and window.height = 500", function () {
+        beforeEach(function () {
+            var parentOriginal = $.prototype.parent,
+                testElement;
+
+            affix('.vcenter-margin#test');
+            $('#test').css('height', "250px");
+            testElement = $('#test')[0];
+            spyOn($.prototype , 'parent').and.callFake(function () {
+                if (this[0] == testElement) {
+                    return $(document.body);
+                } else {
+                    return parentOriginal.apply(this, arguments);
+                }
+            });
+            windowHeighIs(500);
+        });
+
+        it("should have margin-top and margin-bottom 125px", function() {
+            helpers.refresh();
+            expect($('#test').css('margin-top')).toEqual('125px');
+            expect($('#test').css('margin-bottom')).toEqual('125px');
         });
     });
 });

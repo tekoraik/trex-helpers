@@ -10,7 +10,7 @@
         };
 
         _refreshVerticalAligns = function () {
-            $('.valign-abs').each(function () {
+            $('.vcenter-abs').each(function () {
                 var $topElement = $(this).parent();
 
                 if ($topElement[0] == document.body) {
