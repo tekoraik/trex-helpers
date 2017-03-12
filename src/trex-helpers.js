@@ -10,12 +10,31 @@
             _getTopElement,
             _refreshTotalWindowHeight,
             _refreshPercentWindowHeight,
-            _setupGoto;
+            _setupGoto,
+            _fixedHeight,
+            _fixedHeightValue;
 
         _refresh = function() {
+            _fixedHeightValue = undefined;
             _refreshWindowHeight();
             _refreshVerticalAligns();
             _setupGoto();
+        };
+
+        _fixedHeight = function () {
+            var $header, $adminBar;
+            if (_fixedHeightValue === undefined) {
+                _fixedHeightValue = 0;
+                if ($('.fixed').length > 0) {
+                    _fixedHeightValue = $('.fixed').outerHeight();
+                } else {
+                    $header = $('#page-header');
+                    if ($header.length > 0 && $header.css('position', 'fixed')) {
+                        _fixedHeightValue = $header.outerHeight();
+                    }
+                }
+            }
+            return _fixedHeightValue;
         };
 
         _refreshVerticalAligns = function () {
@@ -83,7 +102,7 @@
             var $group = $('.window-height');
 
             $group.css('box-sizing', 'border-box');
-            $group.css('min-height', ($(window).height() - $('.fixed').height()) + 'px');
+            $group.css('min-height', ($(window).height() - _fixedHeight()) + 'px');
         };
 
         _refreshPercentWindowHeight = function () {
@@ -103,7 +122,7 @@
 
                 event.preventDefault();
                 window.history.pushState({}, '', '#' + target.attr('id'));
-                $('html, body').animate({scrollTop: Math.max(0, top - $('.fixed').height())}, 1000, 'swing');
+                $('html, body').animate({scrollTop: Math.max(0, top - _fixedHeight())}, 1000, 'swing');
             });
         };
         return {

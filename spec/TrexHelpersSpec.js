@@ -142,6 +142,23 @@ describe("TrexHelpers", function() {
             });
         });
 
+        describe('and also there are #page-header fixed element', function () {
+            beforeEach(function () {
+                var $page;
+
+                affix('#page-header');
+                $page = $('#page-header');
+                $page.css('height', '10px');
+                $page.css('position', 'fixed');
+            });
+
+            it('should be the window height minus fixed element', function () {
+                helpers.refresh();
+                expect($('.window-height#id1').outerHeight()).toEqual(90);
+                expect($('#id2 > .window-height').outerHeight()).toEqual(90);
+            });
+        });
+
         describe('and this element has padding', function () {
             beforeEach(function () {
                 $('#id1').css('padding', '20px 0px 10px 0px');
