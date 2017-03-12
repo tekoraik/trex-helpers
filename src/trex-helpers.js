@@ -12,13 +12,15 @@
             _refreshPercentWindowHeight,
             _setupGoto,
             _fixedHeight,
-            _fixedHeightValue;
+            _fixedHeightValue,
+            _refreshGradientUnderlines;
 
         _refresh = function() {
             _fixedHeightValue = undefined;
             _refreshWindowHeight();
             _refreshVerticalAligns();
             _setupGoto();
+            _refreshGradientUnderlines();
         };
 
         _fixedHeight = function () {
@@ -29,8 +31,14 @@
                     _fixedHeightValue = $('.fixed').outerHeight();
                 } else {
                     $header = $('#page-header');
-                    if ($header.length > 0 && $header.css('position', 'fixed')) {
+                    $adminBar = $('#wpadminbar');
+
+                    if ($header.length > 0 && $header.css('position') === 'fixed') {
                         _fixedHeightValue = $header.outerHeight();
+                    }
+
+                    if ($adminBar.length > 0) {
+                        _fixedHeightValue += $adminBar.outerHeight();
                     }
                 }
             }
@@ -84,6 +92,32 @@
             });
         };
 
+        _refreshGradientUnderlines = function () {
+            $('.gradient-underline').each(function () {
+                var underline = document.createElement('div'),
+                    width = $(this).data('width') || '80%',
+                    height = $(this).data('height') || '1px',
+                    color = $(this).data('color') || '#000000';
+
+                underline.className = 'underline';
+
+                if ($(this).find('.underline').length === 0) {
+                    $(this).append(underline);
+                    underline = $(this).find('.underline');
+                    underline.css('height', height);
+                    underline.css('width', width);
+                    underline.css('margin', '10px auto 0 auto');
+                    if (Modernizr.cssgradients) {
+                        underline.css('background', '-moz-linear-gradient(left, rgba(0,0,0,0) 0%, ' + color + ' 52%, rgba(0,0,0,0) 100%)');
+                        underline.css('background', '-webkit-linear-gradient(left, rgba(0,0,0,0) 0%,' + color + ' 52%,rgba(0,0,0,0) 100%)');
+                        underline.css('background', 'linear-gradient(to right, rgba(0,0,0,0) 0%,' + color + ' 52%,rgba(0,0,0,0) 100%)');
+                    } else {
+                        underline.css('background', color);
+                    }
+                }
+            });
+        };
+
         _getTopElement = function ($element) {
             var $topElement = $element.parent();
 
@@ -103,6 +137,14 @@
 
             $group.css('box-sizing', 'border-box');
             $group.css('min-height', ($(window).height() - _fixedHeight()) + 'px');
+
+            $group.each(function () {
+                var $element = $(this);
+
+                if ($element.hasClass('forced') || $element.hasClass('slideshow') || $element.css('position') === 'fixed') {
+                    $element.css('height', ($(window).height() - _fixedHeight()) + 'px');
+                }
+            });
         };
 
         _refreshPercentWindowHeight = function () {

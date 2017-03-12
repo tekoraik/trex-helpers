@@ -8,7 +8,8 @@
         <script type="text/javascript" src="../src/trex-helpers.js"></script>
     </head>
     <body>
-        <div class="fixed">Fixed bar</div>
+    <div id="wpadminbar">Admin bar, <a href="#" class="goto" data-target="#window-height-container">goto</a></div>
+        <div id="page-header">Header bar</div>
         <div id="vcenter-abs-container">
             <div class="vcenter-abs">
                 Vertical center absolute
@@ -17,8 +18,12 @@
         <div class="window-height" id="window-height-container">
             <div class="vcenter-abs">Vertical center</div>
         </div>
+        <div class="percent-window" data-percent="50" style="background-color: greenyellow; float: left; width: 100%;">
+            50% window
+        </div>
         <div class="container" style="float: left;">
             <div class="vcenter-margin" style="background-color: yellow; padding: 10px 0px">Vertical center margin</div>
         </div>
+
     </body>
 </html>

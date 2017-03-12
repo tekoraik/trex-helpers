@@ -127,6 +127,9 @@ describe("TrexHelpers", function() {
             helpers.refresh();
             expect($('.window-height#id1').outerHeight()).toEqual(100);
             expect($('#id2 > .window-height').outerHeight()).toEqual(100);
+
+            $('.window-height#id1').append('<div style="height: 200px"></div>');
+            expect($('.window-height#id1').outerHeight()).toEqual(200);
         });
 
         describe('and also there is a fixed element', function () {
@@ -142,20 +145,130 @@ describe("TrexHelpers", function() {
             });
         });
 
-        describe('and also there are #page-header fixed element', function () {
+        describe('and also have forced and slideshow class element', function () {
+            beforeEach(function () {
+                $('#id1').addClass('forced');
+            });
+
+            it('should have height css value setted only when forced is setted', function () {
+                helpers.refresh();
+                expect($('.window-height#id1')[0].style.height).toEqual('100px');
+                expect($('#id2 > .window-height')[0].style.height).toBe("");
+            });
+
+            describe('also with slideshow class', function () {
+                beforeEach(function () {
+                    $('#id1').removeClass('forced');
+                    $('#id1').addClass('slideshow');
+                });
+
+                it('should have height css value setted only when forced is setted', function () {
+                    helpers.refresh();
+                    expect($('.window-height#id1')[0].style.height).toEqual('100px');
+                    expect($('#id2 > .window-height')[0].style.height).toBe("");
+                });
+            });
+
+            describe('also with fixed position', function () {
+                beforeEach(function () {
+                    $('#id1').removeClass('forced');
+                    $('#id1').css('position', 'fixed');
+                });
+
+                it('should have height css value setted only when forced is setted', function () {
+                    helpers.refresh();
+                    expect($('.window-height#id1')[0].style.height).toEqual('100px');
+                    expect($('#id2 > .window-height')[0].style.height).toBe("");
+                });
+            });
+
+            describe('and also have fixed element', function () {
+                beforeEach(function () {
+                    affix('.fixed');
+                    $('.fixed').css('height', '15px');
+                });
+
+                it('should have height css value setted minus fixed only when forced is setted', function () {
+                    helpers.refresh();
+                    expect($('.window-height#id1')[0].style.height).toEqual('85px');
+                    expect($('#id2 > .window-height')[0].style.height).toBe("");
+                });
+            });
+
+            describe('and also have #wpadminbar element and #page-header element', function () {
+                beforeEach(function () {
+                    affix('#wpadminbar');
+                    $('#wpadminbar').css('height', '5px');
+
+                    affix('#page-header');
+                    $('#page-header').css('height', '15px');
+                });
+
+                it('should have height css value setted minus wpadminbar height only when forced is setted', function () {
+                    helpers.refresh();
+                    expect($('.window-height#id1')[0].style.height).toEqual('95px');
+                    expect($('#id2 > .window-height')[0].style.height).toBe("");
+
+                    $('#page-header').css('position', 'fixed');
+                    helpers.refresh();
+                    expect($('.window-height#id1')[0].style.height).toEqual('80px');
+                    expect($('#id2 > .window-height')[0].style.height).toBe("");
+
+                    $('#wpadminbar').remove();
+
+                    helpers.refresh();
+                    expect($('.window-height#id1')[0].style.height).toEqual('85px');
+                    expect($('#id2 > .window-height')[0].style.height).toBe("");
+                });
+            });
+        });
+
+        describe('and also there are #page-header element', function () {
             beforeEach(function () {
                 var $page;
 
                 affix('#page-header');
                 $page = $('#page-header');
                 $page.css('height', '10px');
-                $page.css('position', 'fixed');
+
             });
 
-            it('should be the window height minus fixed element', function () {
+            it('should be the window height', function () {
                 helpers.refresh();
-                expect($('.window-height#id1').outerHeight()).toEqual(90);
-                expect($('#id2 > .window-height').outerHeight()).toEqual(90);
+                expect($('.window-height#id1').outerHeight()).toEqual(100);
+                expect($('#id2 > .window-height').outerHeight()).toEqual(100);
+            });
+
+            describe('and the #page-header has fixed position', function () {
+                beforeEach(function () {
+                    $('#page-header').css('position', 'fixed');
+                });
+
+                afterEach(function () {
+                    $('#page-header').css('position', 'auto');
+                });
+
+                it('should be the window height minus header element', function () {
+                    helpers.refresh();
+                    expect($('.window-height#id1').outerHeight()).toEqual(90);
+                    expect($('#id2 > .window-height').outerHeight()).toEqual(90);
+                });
+
+                describe('and also there is a #wpadminbar element', function () {
+                    beforeEach(function () {
+                        var $adminbar;
+
+                        affix('#wpadminbar');
+                        $adminbar = $('#wpadminbar');
+                        $adminbar.css('height', '15px');
+                    });
+
+                    it('should be the window height minus header element and wpadminbar element', function () {
+                        helpers.refresh();
+                        expect($('.window-height#id1').outerHeight()).toEqual(75);
+                        expect($('#id2 > .window-height').outerHeight()).toEqual(75);
+                    });
+                });
             });
         });
 
@@ -213,6 +326,16 @@ describe("TrexHelpers", function() {
         beforeEach(function () {
             windowHeighIs(600);
             affix('.percent-window#test');
+        });
+
+        describe('and this element has content with 20px height but has not data-percent', function () {
+            beforeEach(function () {
+                $('#test').html('<div style="height: 20px">My content</div>');
+            });
+            it('should have 20px height', function () {
+                helpers.refresh();
+                expect($('#test').height()).toEqual(20);
+            });
         });
 
         describe('and this element has data-percent=40', function () {

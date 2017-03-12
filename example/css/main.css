@@ -11,6 +11,24 @@
     height: 120px;
 }
 
+#wpadminbar {
+    position: fixed;
+    top: 0px;
+    width: 100%;
+    height: 20px;
+    background-color: #1f1b1f;
+    color: white;
+    z-index: 1;
+}
+
+#page-header {
+    position: fixed;
+    top: 20px;
+    width: 100%;
+    height: 60px;
+    z-index: 1;
+    background-color: #b65764;
+}
 
 #window-height-container {
     background-color: #6e85b3;
