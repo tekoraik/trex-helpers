@@ -430,4 +430,20 @@ describe("TrexHelpers", function() {
             });
         });
     });
+
+    describe("when there is a element with sync-property class, and other element as data-target", function () {
+        beforeEach(function () {
+            affix('#target');
+            affix('.sync-property#test');
+            $('#test').data('target', '#target');
+        });
+
+        describe("and the data-from is height and data-to is height", function () {
+            beforeEach(function () {
+                var $test = $('#test');
+                $test.data('from', 'height');
+                $test.data('to', 'padding-top');
+            });
+        });
+    });
 });
