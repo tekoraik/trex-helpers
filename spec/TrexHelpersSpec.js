@@ -440,9 +440,16 @@ describe("TrexHelpers", function() {
 
         describe("and the data-from is height and data-to is height", function () {
             beforeEach(function () {
-                var $test = $('#test');
+                var $test = $('#test'), $target = $('#target').css('height', '250px');
                 $test.data('from', 'height');
                 $test.data('to', 'padding-top');
+
+            });
+
+            it('should have the same properties values', function () {
+                helpers.refresh();
+
+                expect($('#test').css('padding-top')).toEqual('250px');
             });
         });
     });
