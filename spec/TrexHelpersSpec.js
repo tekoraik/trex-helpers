@@ -14,7 +14,12 @@ describe("TrexHelpers", function() {
         });
     };
 
+    afterEach(function () {
+        jasmine.clock().uninstall();
+    });
+
     beforeEach(function() {
+        jasmine.clock().install();
         helpers = trex.helpers;
     });
 
@@ -453,16 +458,9 @@ describe("TrexHelpers", function() {
             });
 
             describe('when the property from changes and tick is incremented in 100ms', function () {
-                beforeEach(function () {
-                    jasmine.clock().install();
-                });
-
-                afterEach(function () {
-                    jasmine.clock().uninstall();
-                });
 
                 it('should change the element "to" property too', function () {
-                    helpers.refresh();
+                    helpers.init();
                     $('#target').css('height', '100px');
                     jasmine.clock().tick(100);
                     expect($('#test').css('padding-top')).toEqual('100px');
@@ -473,8 +471,9 @@ describe("TrexHelpers", function() {
                 });
 
                 it('should change the element "to" property too in multiple refresh calls', function () {
-                    helpers.refresh();
+                    helpers.init();
                     jasmine.clock().tick(10);
+                    helpers.refresh();
 
                     $('#target').css('height', '100px');
                     jasmine.clock().tick(100);
@@ -482,8 +481,9 @@ describe("TrexHelpers", function() {
 
                     $('#target').css('height', '500px');
                     jasmine.clock().tick(90);
-                    expect($('#test').css('padding-top')).toEqual('100px');
+                    expect($('#test').css('padding-top')).toEqual('500px');
 
+                    $('#target').css('height', '400px');
                     jasmine.clock().tick(10);
                     expect($('#test').css('padding-top')).toEqual('500px');
                 });

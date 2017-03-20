@@ -14,7 +14,9 @@
             _fixedHeight,
             _fixedHeightValue,
             _refreshGradientUnderlines,
-            _refreshSyncProperty;
+            _syncProperty,
+            _refreshSyncProperty,
+            _init;
 
         _refresh = function() {
             _fixedHeightValue = undefined;
@@ -25,6 +27,16 @@
             _refreshSyncProperty();
         };
 
+        _init = function () {
+            _syncProperty();
+            _refresh();
+        };
+
+        _syncProperty = function () {
+            _refreshSyncProperty();
+            setTimeout(_syncProperty, 100);
+        };
+
         _refreshSyncProperty = function () {
             $('.sync-property').each(function () {
                 var $target = $($(this).data('target')),
@@ -33,7 +45,6 @@
 
                 $(this).css(propertyTo, $target.css(propertyFrom));
             });
-            setTimeout(_refreshSyncProperty, 100);
         };
 
         _fixedHeight = function () {
@@ -182,11 +193,12 @@
         };
         return {
             refresh: _refresh,
+            init: _init,
         }
     }());
 
     $(function () {
-        trex.helpers.refresh();
+        trex.helpers.init();
     });
     $(window).resize(trex.helpers.refresh);
 }(jQuery));
