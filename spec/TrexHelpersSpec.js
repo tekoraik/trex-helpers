@@ -451,6 +451,43 @@ describe("TrexHelpers", function() {
 
                 expect($('#test').css('padding-top')).toEqual('250px');
             });
+
+            describe('when the property from changes and tick is incremented in 100ms', function () {
+                beforeEach(function () {
+                    jasmine.clock().install();
+                });
+
+                afterEach(function () {
+                    jasmine.clock().uninstall();
+                });
+
+                it('should change the element "to" property too', function () {
+                    helpers.refresh();
+                    $('#target').css('height', '100px');
+                    jasmine.clock().tick(100);
+                    expect($('#test').css('padding-top')).toEqual('100px');
+
+                    $('#target').css('height', '500px');
+                    jasmine.clock().tick(100);
+                    expect($('#test').css('padding-top')).toEqual('500px');
+                });
+
+                it('should change the element "to" property too in multiple refresh calls', function () {
+                    helpers.refresh();
+                    jasmine.clock().tick(10);
+
+                    $('#target').css('height', '100px');
+                    jasmine.clock().tick(100);
+                    expect($('#test').css('padding-top')).toEqual('100px');
+
+                    $('#target').css('height', '500px');
+                    jasmine.clock().tick(90);
+                    expect($('#test').css('padding-top')).toEqual('100px');
+
+                    jasmine.clock().tick(10);
+                    expect($('#test').css('padding-top')).toEqual('500px');
+                });
+            });
         });
     });
 });

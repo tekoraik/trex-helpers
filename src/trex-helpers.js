@@ -13,7 +13,8 @@
             _setupGoto,
             _fixedHeight,
             _fixedHeightValue,
-            _refreshGradientUnderlines;
+            _refreshGradientUnderlines,
+            _refreshSyncProperty;
 
         _refresh = function() {
             _fixedHeightValue = undefined;
@@ -21,6 +22,18 @@
             _refreshVerticalAligns();
             _setupGoto();
             _refreshGradientUnderlines();
+            _refreshSyncProperty();
+        };
+
+        _refreshSyncProperty = function () {
+            $('.sync-property').each(function () {
+                var $target = $($(this).data('target')),
+                    propertyFrom = $(this).data('from'),
+                    propertyTo = $(this).data('to');
+
+                $(this).css(propertyTo, $target.css(propertyFrom));
+            });
+            setTimeout(_refreshSyncProperty, 100);
         };
 
         _fixedHeight = function () {
