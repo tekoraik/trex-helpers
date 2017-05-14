@@ -39,11 +39,17 @@
 
         _refreshSyncProperty = function () {
             $('.sync-property').each(function () {
+                console.log("OK property sync");
                 var $target = $($(this).data('target')),
                     propertyFrom = $(this).data('from'),
                     propertyTo = $(this).data('to');
 
-                $(this).css(propertyTo, $target.css(propertyFrom));
+                if (propertyFrom === "height") {
+                    $(this).css(propertyTo, $target.outerHeight() + "px");
+                } else {
+                    $(this).css(propertyTo, $target.css(propertyFrom));
+                }
+
             });
         };
 
